@@ -1,51 +1,5 @@
 import os
-import stat
-import time
-import psutil
-
-##created helper functions
-
-##the list_directory function will allow to list the files/directories if its called with a path specified
-def list_directory(path):
-    try:
-        ##listdir used to get all the files/directories in the root directory
-        entries = os.listdir(path)
-        for e in entries:
-            full_path = os.path.join(path, e)
-            if os.path.isdir(full_path):
-                print(f"[DIR]  {e}")  ##used to print the directory name
-            else:
-                print(f"[FILE] {e}")  ##used to print the file name if no directory
-    except Exception as ex:
-        print("Error:", ex)
-
-##used to get the info of a file
-def show_file_info(path):
-    if not os.path.exists(path):
-        print("File does not exist")
-        return
-    info = os.stat(path)
-    ##get all relevant info of a file
-    print(f"File: {path}")
-    print(f"Size: {info.st_size} bytes")
-    print(f"Permissions: {stat.filemode(info.st_mode)}")
-    print(f"Owner UID: {info.st_uid}, GID: {info.st_gid}")
-    print(f"Inode: {info.st_ino}")
-    print(f"Last accessed: {time.ctime(info.st_atime)}")
-    print(f"Last modified: {time.ctime(info.st_mtime)}")
-
-
-
-##showing processes
-def show_all_processes():
-    for process in psutil.process_iter(['pid', 'name', 'username']):
-        try:
-            pid = process.info['pid']
-            name = process.info['name']
-            user = process.info['username']
-            print(f"PID: {pid}, Name: {name}, User: {user}")
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            continue
+from helper_functions import *
 
 
 
@@ -86,20 +40,49 @@ def main():
             #processes_using_file(os.path.join(current_path, cmd[1]))
             show_all_processes()
 
+        ##user can get help with the available commands
         elif cmd[0] == "help":
-            print("Available commands: ls, cd <dir>, info <file>, procs [limit], exit")
+            print("Available commands: ls, cd <dir>, info <file>, touch, write, rd, del, exit")
 
+        ##user can use 'touch' to create a file
+        elif cmd[0] == "touch" and len(cmd) > 1:
+            create_file(os.path.join(current_path, cmd[1]))
+
+        ##user can use 'write' to write to a file
+        elif cmd[0] == "write" and len(cmd) > 2:
+             path = os.path.join(current_path, cmd[1])
+             content = " ".join(cmd[2:])
+             append_to_file(path, content)
+
+        ##user can use rd to read a file
+        elif cmd[0] == "rd" and len(cmd) > 1:
+             read_file(os.path.join(current_path, cmd[1]))
+
+        ##user can use del to delete a file
+        elif cmd[0] == "del" and len(cmd) > 1:
+            delete_path(os.path.join(current_path, cmd[1]))
+
+        ##user can see memory usage
+        elif cmd[0] == "check_mem":
+            show_process_usage()
+
+        ##user can see recent files
+        elif cmd[0] == "recent_files":
+            show_recent_files(current_path)
+
+        elif cmd[0] == "monitor":
+            print("Monitoring application usage...")
+            stats = monitor_app_usage(30)
+            analyze_usage(stats)
+
+        ##if first word is exit then we leave the file explorer
         elif cmd[0] == "exit":
-            ##if first word is exit then we leave the file explorer
             print("Exiting File Explorer...")
             break
 
-
-
-
         else:
             ##showing the approporiate commands
-            print("Commands: ls, cd <dir>, info <file>, exit")
+            print("Commands: ls, cd <dir>, info <file>, touch, write, rd, del, exit")
 
 ##only calls main if file run directly
 if __name__ == "__main__":

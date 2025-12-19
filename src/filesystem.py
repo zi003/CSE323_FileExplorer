@@ -7,96 +7,110 @@ def list_directory(path):
     try:
         ##listdir used to get all the files/directories in the root directory
         entries = os.listdir(path)
+        result = []  #to store the list of results
         for e in entries:
             full_path = os.path.join(path, e)
             if os.path.isdir(full_path):
-                print(f"[DIR]  {e}")  ##used to print the directory name
+                result.append(f"[DIR]  {e}")  ##used to print the directory name
             else:
-                print(f"[FILE] {e}")  ##used to print the file name if no directory
+                result.append(f"[FILE] {e}")  ##used to print the file name if no directory
+
+        return "\n".join(result)
     except Exception as ex:
-        print("Error:", ex)
+
+         return f"Error: {ex}"
 
 ##used to get the info of a file
 def show_file_info(path):
     if not os.path.exists(path):
-        print("File does not exist")
-        return
+        return "File does not exist" ##returning a string for the GUI
+        
     info = os.stat(path)
     ##get all relevant info of a file
-    print(f"File: {path}")
-    print(f"Size: {info.st_size} bytes")
-    print(f"Permissions: {stat.filemode(info.st_mode)}")
-    print(f"Owner UID: {info.st_uid}, GID: {info.st_gid}")
-    print(f"Inode: {info.st_ino}")
-    print(f"Last accessed: {time.ctime(info.st_atime)}")
-    print(f"Last modified: {time.ctime(info.st_mtime)}")
+    result = f"File: {path} \n"
+    result += f"Size: {info.st_size} bytes \n"
+    result += f"Permissions: {stat.filemode(info.st_mode)} \n"
+    result += f"Owner UID: {info.st_uid}, GID: {info.st_gid} \n"
+    result += f"Inode: {info.st_ino} \n"
+    result += f"Last accessed: {time.ctime(info.st_atime)} \n"
+    result += f"Last modified: {time.ctime(info.st_mtime)} \n"
 
+    return result
 
 
 ##creating a file
 def create_file(path):
     try:
         if os.path.exists(path):
-            print("File already exists.")
-            return
+            return "File already exists."
 
         with open(path, 'w') as f:  #open file in write mode
             pass  # creates empty file
 
-        print("File created successfully.")
+        return "File created successfully."
     except Exception as e:
-        print("Error creating file:", e)
+        return f"Error creating file: {e}"
 
 #appending to a file
 def append_to_file(path, content):
     try:
         if not os.path.exists(path):
-            print("File does not exist.")
-            return
+            return "File does not exist."
+           
 
         ##opening a file in append mode
         with open(path, 'a') as f:
             f.write(content + "\n")  ##appending to the file
 
-        print("Content appended.")
+        return "Content appended Successfully!"
     except Exception as e:
-        print("Error appending to file:", e)
+        return f"Error appending to file:, {e}"
 
 ##reading a file
 def read_file(path):
     try:
         ##check if file exists
         if not os.path.exists(path):
-            print("File does not exist.")
-            return
+            return "File does not exist."
+            
 
         with open(path, 'r') as f:
-            print(f.read())
+            return f.read()
     except Exception as e:
-        print("Error reading file:", e)
+       return f"Error reading file:, {e}"
 
 ##deleting a file
 def delete_path(path):
     try:
         if not os.path.exists(path):
-            print("Path does not exist.")
-            return
+            return "Path does not exist."
+            
         ##if file then delete file
         if os.path.isfile(path):
             os.remove(path)
-            print("File deleted.")
+            return "File deleted."
 
         ##if directory then delete directory 
         elif os.path.isdir(path):
             os.rmdir(path)
-            print("Directory deleted.")
+            return "Directory deleted."
 
     ##exceptions handled
     except OSError:
-        print("Directory not empty or permission denied.")
+        return "Directory not empty or permission denied."
     except Exception as e:
-        print("Error deleting:", e)
+       return f"Error deleting:, {e}"
 
+##helper function to save a file 
+def save_file(path, content):
+    try:
+        if not os.path.exists(path):
+            return "File does not exist."
+        with open(path, 'w') as f:  # overwrite file
+            f.write(content)
+        return "File saved successfully."
+    except Exception as e:
+        return f"Error saving file: {e}"
 
 
 ##function to show recent files /directory in current dir
@@ -113,12 +127,14 @@ def show_recent_files(path, top=5):
                 continue  # skip protected files
  
    if not all_files:
-        print("No files found.")
-        return
+        return "No files found."
 
    all_files.sort(key=lambda x: x[1], reverse=True)
+   result = []
+   result.append(f"Top {top} recent files under {path}:\n")
 
-   print(f"Top {top} recent files under {path}:\n")
    for f, t in all_files[:top]:
-        print(f"{f} — Last modified: {time.ctime(t)}")
+        result.append(f"{f} — Last modified: {time.ctime(t)}")
 
+
+   return "\n".join(result)

@@ -34,8 +34,25 @@ def monitor_app_usage(duration=30):
 SOCIAL_APPS = ["chrome.exe", "msedge.exe", "firefox.exe", "discord.exe"]
 
 def analyze_usage(usage_stats, cpu_threshold=20):
+    alerts = []
+
     for app, stats in usage_stats.items():
+        if stats['samples'] == 0:
+            continue
+
         avg_cpu = stats['cpu'] / stats['samples']
 
         if app.lower() in SOCIAL_APPS and avg_cpu > cpu_threshold:
-            print(f"⚠ ALERT: High usage detected for {app} (Avg CPU: {avg_cpu:.2f}%)")
+            alerts.append(
+                f"⚠ ALERT: {app} avg CPU {avg_cpu:.2f}%"
+            )
+
+    if not alerts:
+        return "No excessive social media usage detected."
+
+    return "\n".join(alerts)
+
+##using a single function to combine both the above functions
+def monitor_and_analyze(duration=30, cpu_threshold=20):
+    usage_stats = monitor_app_usage(duration)
+    return analyze_usage(usage_stats, cpu_threshold)

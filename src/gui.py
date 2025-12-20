@@ -5,6 +5,7 @@ import os
 # importing functions in the filesystem
 from filesystem import *
 from process import *
+from usage_monitor import *
 
 #creating the window with title and size 
 root = tk.Tk()
@@ -198,6 +199,17 @@ def show_usage_gui():
 tk.Button(btn_frame, text="All Processes", command=show_processes_gui, width=15).grid(row=0, column=2, padx=5, pady=5)
 tk.Button(btn_frame, text="CPU / Memory", command=show_usage_gui, width=15).grid(row=0, column=3, padx=5, pady=5)
 
+
+##gui function to monitor usage 
+def monitor_usage_gui():
+    write_output("⏳ Monitoring app usage...\nPlease wait...")
+
+    root.update()  # force GUI refresh
+
+    result = monitor_and_analyze(duration=15, cpu_threshold=20)
+    write_output(result)
+
+tk.Button(btn_frame, text="Monitor App Usage", command=monitor_usage_gui, width=18).grid(row=0, column=4, padx=5, pady=5)
 
 ##calls the gui to run
 root.mainloop()

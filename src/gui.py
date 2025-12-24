@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 import os
 
-# importing functions in the filesystem
+# importing helper functions
 from filesystem import *
 from process import *
 from usage_monitor import *
@@ -10,62 +10,55 @@ from protectedFile import *
 
 #creating the window with title and size 
 root = tk.Tk()
-root.title("OS File Explorer & Monitor")
+root.title("File Explorer & Monitor")
 root.geometry("900x600")
 
-#creating the labels 
-path_label = tk.Label(root, text="Current Path:")
-path_label.pack(anchor="w", padx=10)
+##getting the folders/file/lock
+folder_icon = tk.PhotoImage(file="icons/folder.png")
+file_icon   = tk.PhotoImage(file="icons/file.png")
 
 
-path_entry = tk.Entry(root, width=80)
-path_entry.pack(padx=10)
-path_entry.insert(0, os.getcwd()) ##current directory set in the current path
-
-##creating space to display results
-# Frame to hold Text + Scrollbar
-output_frame = tk.Frame(root)
-output_frame.pack(fill="both", expand=True, padx=10, pady=10)
-
-# Scrollbar
-scrollbar = tk.Scrollbar(output_frame)
-scrollbar.pack(side="right", fill="y")
-
-# Text widget
-output = tk.Text(output_frame, height=25, yscrollcommand=scrollbar.set)
-output.pack(side="left", fill="both", expand=True)
-
-# Link scrollbar to text widget
-scrollbar.config(command=output.yview)
-
-# Initial text
-output.insert("1.0", "Type here to append to a file if you choose edit file..\n")
 
 
-##frame for the buttons
-btn_frame = tk.Frame(root)
-btn_frame.pack(pady=10, padx=10, fill="x")  # container for buttons
+#creating the path frame
+path_frame = tk.LabelFrame(root, text="Path Navigation", padx=10, pady=10)
+path_frame.pack(fill="x", padx=10, pady=5)
 
-##function used to display the output
+#Adding label for the path 
+tk.Label(path_frame, text="Current Path:").grid(row=0, column=0, sticky="w")
+
+path_entry = tk.Entry(path_frame, width=70)
+path_entry.grid(row=0, column=1, padx=5)
+
+##setting the current path as the defualt path 
+path_entry.insert(0, os.getcwd())
+
+
+##function used to display the output on the output frame
 def write_output(text):
     output.delete("1.0", tk.END)
     output.insert(tk.END, text)
-
+   
 #list files gui
 def list_files_gui():
     path = path_entry.get()
+    ##removes existing items from the tree before adding new ones
+    tree.delete(*tree.get_children()) 
 
     try:
-        files = list_directory(path)   # helper function
-        write_output(files)
+         for item in get_directory_items(path):
+            #if the item is a directory 
+            if item["is_dir"]:
+                 #insert the file/folder with extra hidden info
+                 tree.insert("", "end", text=item["name"], image=folder_icon, values=(item["path"], "dir"))
+            else:
+                 tree.insert("", "end", text=item["name"], image=file_icon, values=(item["path"], "file"))
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
-##this button provokes the list_files_gui function which calls the helper function
-btn_ls = tk.Button(btn_frame, text="List Files", command=list_files_gui, width=15)
-btn_ls.grid(row=0, column=0, padx=5, pady=5)
 
-
+##the list files button 
+tk.Button(path_frame, text="List Files", width=12, command=list_files_gui).grid(row=0, column=2, padx=5)
 
 ##function used to show file info
 def file_info_gui():
@@ -76,21 +69,6 @@ def file_info_gui():
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
-##button used to display the file info which calls the file_info_gui function
-btn_ls = tk.Button(btn_frame, text="File Info (Inode)", command=file_info_gui, width=15)
-btn_ls.grid(row=0, column=1, padx=5, pady=5)
-
-
-file_frame = tk.Frame(root)
-file_frame.pack(pady=10, padx=10, fill="x")
-
-# Label
-file_label = tk.Label(file_frame, text="File Name:")
-file_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
-
-# Entry
-file_name_entry = tk.Entry(file_frame, width=40)
-file_name_entry.grid(row=0, column=1, padx=5, pady=5)
 
 ##creating file with the gui
 def create_file_gui():
@@ -105,14 +83,6 @@ def create_file_gui():
     result = create_file(full_path)       # call your helper
     write_output(result)
 
-
-#Button under the file
-file_btn_frame = tk.Frame(file_frame)
-file_btn_frame.grid(row=1, column=0, columnspan=2, pady=5)
-
-# Create button
-btn_create = tk.Button(file_btn_frame, text="Create", command=create_file_gui, width=12)
-btn_create.pack(side="left", padx=5)
 
 
 
@@ -139,28 +109,28 @@ def read_file_gui():
         result = read_file(full_path)
         write_output(result)
 
+##this function asks for password to read a protected file
 def prompt_password_and_read(path):
     pw_win = tk.Toplevel(root)
     pw_win.title("Protected File")
+    pw_win.geometry("400x200")
 
-    tk.Label(pw_win, text="Enter Password:").pack(pady=5)
-    pw_entry = tk.Entry(pw_win, show="*")
-    pw_entry.pack(pady=5)
+    tk.Label(pw_win, text="Enter Password:", font=("Arial", 10)).pack(pady=10)
+    pw_entry = tk.Entry(pw_win, show="*", font=("Arial", 8), width=30)
+    pw_entry.pack(pady=10)
 
+    ##verify the password
     def verify():
         password = pw_entry.get()
         result = read_protected_file(path, password)
         write_output(result)
         pw_win.destroy()
 
-    tk.Button(pw_win, text="Unlock & Read", command=verify).pack(pady=10)
-
-btn_read = tk.Button(file_btn_frame, text="Read", command=read_file_gui, width=12)
-btn_read.pack(side="left", padx=5)
+    tk.Button(pw_win, text="Unlock & Read", font=("Arial", 8), command=verify).pack(pady=15)
 
 
 
-# Delete button
+# Delete function gui
 def delete_file_gui():
     directory = path_entry.get()
     file_name = file_name_entry.get()
@@ -171,40 +141,7 @@ def delete_file_gui():
     result = delete_path(full_path)  # make sure delete_path returns string
     write_output(result)
 
-btn_delete = tk.Button(file_btn_frame, text="Delete", command=delete_file_gui, width=12)
-btn_delete.pack(side="left", padx=5)
-
-##append to a file
-def append_file_gui():
-
-    
-    directory = path_entry.get()
-    file_name = file_name_entry.get()
-    content = output.get("1.0", tk.END).strip()  # get all text from Text widget
-
-    if not file_name:
-        write_output("Please enter a file name.")
-        return
-    if not content:
-        write_output("Text area is empty.")
-        return
-
-    full_path = os.path.join(directory, file_name)
-
-    if is_protected_file(full_path):
-         write_output("Cannot append: File is password protected.")
-    
-    else:
-     result = append_to_file(full_path, content)  # helper function
-     write_output(result)
-     ##to clear the text area after appending will show success message for 1.5 seconds before clearing
-     root.after(1500, lambda: output.delete("1.0", tk.END))
-
-##append button
-btn_append = tk.Button(file_btn_frame, text="Append", command=append_file_gui, width=12)
-btn_append.pack(side="left", padx=5)
-
-
+# Function to save a file
 def save_file_gui():
         directory = path_entry.get()
         file_name = file_name_entry.get()
@@ -221,38 +158,8 @@ def save_file_gui():
             result = save_file(full_path, content)  # ensure save_file returns string
             write_output(result)
 
-##button to save/edit
-btn_save = tk.Button(file_btn_frame, text="Save/Edit", command=save_file_gui, width=12)
-btn_save.pack(side="left", padx=5)
-
-#gui function to output all the processes
-def show_processes_gui():
-    output = show_all_processes()
-    write_output(output)
-
-#gui function to display usage of the processes
-def show_usage_gui():
-    output = show_process_usage()
-    write_output(output)
-
-#buttons to view all processes/usage
-tk.Button(btn_frame, text="All Processes", command=show_processes_gui, width=15).grid(row=0, column=2, padx=5, pady=5)
-tk.Button(btn_frame, text="CPU / Memory", command=show_usage_gui, width=15).grid(row=0, column=3, padx=5, pady=5)
-
-
-##gui function to monitor usage 
-def monitor_usage_gui():
-    write_output("Monitoring app usage...\nPlease wait...")
-
-    root.update()  # force GUI refresh
-
-    result = monitor_and_analyze(duration=15, cpu_threshold=20)
-    write_output(result)
-
-tk.Button(btn_frame, text="Monitor App Usage", command=monitor_usage_gui, width=18).grid(row=0, column=4, padx=5, pady=5)
 
 ##gui function to create protected file
-
 def create_protected_file_gui():
     directory = path_entry.get()
     file_name = file_name_entry.get()
@@ -283,10 +190,115 @@ def create_protected_file_gui():
     result = create_protected_file(full_path, password, content)
     write_output(result)
 
-##Button used to create a protected file
-protected_button = tk.Button(file_btn_frame, text="Create Protected",command=create_protected_file_gui)
-protected_button.pack(side="left", padx=5)
 
+##creating file frame
+file_frame = tk.LabelFrame(root, text="File Operations", padx=10, pady=10)
+file_frame.pack(fill="x", padx=10, pady=5)
+
+tk.Label(file_frame, text="File Name:").grid(row=0, column=0, sticky="w")
+
+file_name_entry = tk.Entry(file_frame, width=25)
+file_name_entry.grid(row=0, column=1, padx=5)
+
+
+##creating buttons which use this frame
+#Create button
+tk.Button(file_frame, text="Create", width=12, command=create_file_gui).grid(row=1, column=0, pady=5)
+
+#Read button
+tk.Button(file_frame, text="Read", width=12, command=read_file_gui).grid(row=1, column=1, pady=5)
+
+#Edit/Save button
+tk.Button(file_frame, text="Edit / Save", width=12, command=save_file_gui).grid(row=1, column=2, padx=20)
+
+#Delete button
+tk.Button(file_frame, text="Delete", width=12, command=delete_file_gui).grid(row=1, column=3, padx=20)
+
+#Create Protected button
+tk.Button(file_frame, text="Create Protected", width=15, command=create_protected_file_gui).grid(row=1, column=4, padx=20)
+
+
+#gui function to output all the processes
+def show_processes_gui():
+    output = show_all_processes()
+    write_output(output)
+
+#gui function to display usage of the processes
+def show_usage_gui():
+    output = show_process_usage()
+    write_output(output)
+
+
+##gui function to monitor usage 
+def monitor_usage_gui():
+    write_output("Monitoring app usage...\nPlease wait...")
+
+    root.update()  # force GUI refresh
+
+    result = monitor_and_analyze(duration=15, cpu_threshold=20)
+    write_output(result)
+
+##seperate frame for processes
+proc_frame = tk.LabelFrame(root, text="Process & Usage Monitor", padx=10, pady=10)
+proc_frame.pack(fill="x", padx=10, pady=5)
+
+#button to view all processes 
+tk.Button(proc_frame, text="All Processes", width=15,command=show_processes_gui).grid(row=0, column=0, padx=5)
+
+#button to view CPU/Memory usage of processes
+tk.Button(proc_frame, text="CPU / Memory", width=15,command=show_usage_gui).grid(row=0, column=1, padx=5)
+
+#button to view App Usage Alert
+tk.Button(proc_frame, text="App Usage Alert", width=15,command=monitor_usage_gui).grid(row=0, column=2, padx=5)
+
+
+##making tree view to view the files nicely
+file_view_frame = tk.LabelFrame(root, text="File View", padx=5, pady=5)
+file_view_frame.pack(fill="both", expand=True, padx=10, pady=5)
+tree = ttk.Treeview(file_view_frame)
+tree.pack(fill="both", expand=True)
+
+##can click on files
+def on_file_select(event):
+    selected = tree.focus()
+    if not selected:
+        return
+
+    # "dir" or "file" -> retrieving that info from the values
+    file_type = tree.item(selected, "values")[1]  
+    full_path = tree.item(selected, "values")[0]
+
+    #if its a file then that file is put in the file entry
+    if file_type == "file":
+        file_name_entry.delete(0, tk.END)
+        file_name = os.path.basename(full_path)
+        file_name_entry.delete(0, tk.END)
+        file_name_entry.insert(0, file_name)
+
+    # if its a folder then update the path to include the folder
+    elif file_type == "dir":
+        current_path = path_entry.get()
+        new_path = os.path.join(current_path, tree.item(selected, "text"))
+        path_entry.delete(0, tk.END)
+        path_entry.insert(0, new_path)
+        
+        # Auto refresh tree view
+        list_files_gui()
+
+tree.bind("<<TreeviewSelect>>", on_file_select)
+
+##display output (creating output frame)
+output_frame = tk.LabelFrame(root, text="Output / File Content", padx=5, pady=5)
+output_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+##making the output frame scrollable
+scrollbar = tk.Scrollbar(output_frame)
+scrollbar.pack(side="right", fill="y")
+
+output = tk.Text(output_frame, wrap="word", yscrollcommand=scrollbar.set)
+output.pack(fill="both", expand=True)
+
+scrollbar.config(command=output.yview)
 
 
 ##calls the gui to run

@@ -2,6 +2,20 @@ import os
 import time
 import stat 
 
+##function to get directory
+def get_directory_items(path):
+    items = []
+    for name in os.listdir(path):
+        full_path = os.path.join(path, name)
+        items.append({
+            "name": name,
+            "path": full_path,
+            "is_dir": os.path.isdir(full_path)
+        })
+    return items
+
+
+
 ##the list_directory function will allow to list the files/directories if its called with a path specified
 def list_directory(path):
     try:

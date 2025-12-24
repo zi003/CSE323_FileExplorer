@@ -23,7 +23,7 @@ def main():
 
         ##if the user's command starts with 'ls' then list_directory is called
         if cmd[0] == "ls":
-            list_directory(current_path)
+            print("Hello")
 
         ##if the user's command starts with 'cd' 
         elif cmd[0] == "cd" and len(cmd) > 1:

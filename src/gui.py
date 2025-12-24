@@ -18,8 +18,6 @@ folder_icon = tk.PhotoImage(file="icons/folder.png")
 file_icon   = tk.PhotoImage(file="icons/file.png")
 
 
-
-
 #creating the path frame
 path_frame = tk.LabelFrame(root, text="Path Navigation", padx=10, pady=10)
 path_frame.pack(fill="x", padx=10, pady=5)
@@ -68,7 +66,11 @@ def file_info_gui():
         write_output(info)
     except Exception as e:
         messagebox.showerror("Error", str(e))
+    show_output()
 
+##output frame only appears when this function is called
+def show_output():
+    output_frame.pack(fill="both", expand=True, padx=10, pady=10) 
 
 ##creating file with the gui
 def create_file_gui():
@@ -82,7 +84,7 @@ def create_file_gui():
     full_path = os.path.join(directory, file_name)
     result = create_file(full_path)       # call your helper
     write_output(result)
-
+    show_output()
 
 
 
@@ -108,6 +110,7 @@ def read_file_gui():
        
         result = read_file(full_path)
         write_output(result)
+    show_output()
 
 ##this function asks for password to read a protected file
 def prompt_password_and_read(path):
@@ -140,6 +143,7 @@ def delete_file_gui():
     full_path = os.path.join(directory, file_name)
     result = delete_path(full_path)  # make sure delete_path returns string
     write_output(result)
+    show_output()
 
 # Function to save a file
 def save_file_gui():
@@ -157,6 +161,8 @@ def save_file_gui():
             content = output.get("1.0", tk.END).strip()
             result = save_file(full_path, content)  # ensure save_file returns string
             write_output(result)
+        
+        show_output()
 
 
 ##gui function to create protected file
@@ -189,6 +195,7 @@ def create_protected_file_gui():
     full_path = os.path.join(directory, file_name)
     result = create_protected_file(full_path, password, content)
     write_output(result)
+    show_output()
 
 
 ##creating file frame
@@ -214,19 +221,25 @@ tk.Button(file_frame, text="Edit / Save", width=12, command=save_file_gui).grid(
 #Delete button
 tk.Button(file_frame, text="Delete", width=12, command=delete_file_gui).grid(row=1, column=3, padx=20)
 
+#File Info Button
+tk.Button(file_frame, text="File Info", width=12, command=file_info_gui).grid(row=1, column=4, padx=20)
+
+
 #Create Protected button
-tk.Button(file_frame, text="Create Protected", width=15, command=create_protected_file_gui).grid(row=1, column=4, padx=20)
+tk.Button(file_frame, text="Create Protected", width=15, command=create_protected_file_gui).grid(row=1, column=5, padx=20)
 
 
 #gui function to output all the processes
 def show_processes_gui():
     output = show_all_processes()
     write_output(output)
+    show_output()
 
 #gui function to display usage of the processes
 def show_usage_gui():
     output = show_process_usage()
     write_output(output)
+    show_output()
 
 
 ##gui function to monitor usage 
@@ -237,6 +250,7 @@ def monitor_usage_gui():
 
     result = monitor_and_analyze(duration=15, cpu_threshold=20)
     write_output(result)
+    show_output()
 
 ##seperate frame for processes
 proc_frame = tk.LabelFrame(root, text="Process & Usage Monitor", padx=10, pady=10)
@@ -289,7 +303,7 @@ tree.bind("<<TreeviewSelect>>", on_file_select)
 
 ##display output (creating output frame)
 output_frame = tk.LabelFrame(root, text="Output / File Content", padx=5, pady=5)
-output_frame.pack(fill="both", expand=True, padx=10, pady=10)
+#output_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
 ##making the output frame scrollable
 scrollbar = tk.Scrollbar(output_frame)

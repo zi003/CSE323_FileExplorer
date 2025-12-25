@@ -21,10 +21,6 @@ def main():
         if not cmd:
             continue  # Skip if user presses enter without typing anything
 
-        ##if the user's command starts with 'ls' then list_directory is called
-        if cmd[0] == "ls":
-            print("Hello")
-
         ##if the user's command starts with 'cd' 
         elif cmd[0] == "cd" and len(cmd) > 1:
             new_path = os.path.join(current_path, cmd[1])

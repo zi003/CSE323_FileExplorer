@@ -249,7 +249,7 @@ def monitor_usage_gui():
 
     root.update()  # force GUI refresh
 
-    result = monitor_and_analyze(duration=15, cpu_threshold=20)
+    result = monitor_and_analyze(duration=15, cpu_threshold=20, time_threshold_minutes=30)
     write_output(result)
     show_output()
 

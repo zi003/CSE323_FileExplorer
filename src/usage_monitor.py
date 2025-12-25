@@ -53,6 +53,6 @@ def analyze_usage(usage_stats, cpu_threshold=20):
     return "\n".join(alerts)
 
 ##using a single function to combine both the above functions
-def monitor_and_analyze(duration=30, cpu_threshold=20):
+def monitor_and_analyze(duration=10, cpu_threshold=20):
     usage_stats = monitor_app_usage(duration)
     return analyze_usage(usage_stats, cpu_threshold)

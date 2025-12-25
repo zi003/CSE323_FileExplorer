@@ -68,6 +68,10 @@ def file_info_gui():
         messagebox.showerror("Error", str(e))
     show_output()
 
+#File Info Button
+tk.Button(path_frame, text="File/Folder Info", width=12, command=file_info_gui).grid(row=0, column=3, padx=5)
+
+
 ##output frame only appears when this function is called
 def show_output():
     output_frame.pack(fill="both", expand=True, padx=10, pady=10) 
@@ -221,12 +225,9 @@ tk.Button(file_frame, text="Edit / Save", width=12, command=save_file_gui).grid(
 #Delete button
 tk.Button(file_frame, text="Delete", width=12, command=delete_file_gui).grid(row=1, column=3, padx=20)
 
-#File Info Button
-tk.Button(file_frame, text="File Info", width=12, command=file_info_gui).grid(row=1, column=4, padx=20)
-
 
 #Create Protected button
-tk.Button(file_frame, text="Create Protected", width=15, command=create_protected_file_gui).grid(row=1, column=5, padx=20)
+tk.Button(file_frame, text="Create Protected", width=15, command=create_protected_file_gui).grid(row=1, column=4, padx=20)
 
 
 #gui function to output all the processes
@@ -268,7 +269,10 @@ tk.Button(proc_frame, text="App Usage Alert", width=15,command=monitor_usage_gui
 
 ##making tree view to view the files nicely
 file_view_frame = tk.LabelFrame(root, text="File View", padx=5, pady=5)
-file_view_frame.pack(fill="both", expand=True, padx=10, pady=5)
+#file_view_frame.pack(fill="both", expand=True, padx=10, pady=5)
+file_view_frame.config(width=600, height=200)
+file_view_frame.pack_propagate(False)  ##preventing the frame from fitting the children
+file_view_frame.pack(padx=10, pady=5) 
 tree = ttk.Treeview(file_view_frame)
 tree.pack(fill="both", expand=True)
 

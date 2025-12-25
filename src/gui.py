@@ -330,7 +330,7 @@ tree.bind("<<TreeviewSelect>>", on_file_select)
 
 ##display output (creating output frame)
 output_frame = tk.LabelFrame(root, text="Output / File Content", padx=5, pady=5)
-#output_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
 
 ##making the output frame scrollable
 scrollbar = tk.Scrollbar(output_frame)

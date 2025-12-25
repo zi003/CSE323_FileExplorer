@@ -4,7 +4,7 @@ from process import *
 from usage_monitor import *
 
 
-##originally made for CLI
+##originally made for CLI (Doesnt work now)
 def main():
     # Start in the current working directory
     

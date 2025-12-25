@@ -19,12 +19,10 @@ file_icon   = tk.PhotoImage(file="icons/file.png")
 
 ##making tree view to view the files nicely
 file_view_frame = tk.LabelFrame(root, text="File View", padx=5, pady=5)
-#file_view_frame.pack(fill="both", expand=True, padx=10, pady=5)
 file_view_frame.config(width=600, height=200)
 file_view_frame.pack_propagate(False)  ##preventing the frame from fitting the children
 file_view_frame.pack(padx=10, pady=5) 
-tree = ttk.Treeview(file_view_frame)
-tree.pack(fill="both", expand=True)
+
 
 #creating the path frame
 path_frame = tk.LabelFrame(root, text="Path Navigation", padx=10, pady=10)
@@ -38,6 +36,7 @@ path_entry.grid(row=0, column=1, padx=5)
 
 ##setting the current path as the defualt path 
 path_entry.insert(0, os.getcwd())
+
 
 
 ##function used to display the output on the output frame
@@ -65,6 +64,29 @@ def list_files_gui():
 
 ##the list files button 
 tk.Button(path_frame, text="List Files", width=12, command=list_files_gui).grid(row=0, column=2, padx=5)
+
+##function to go back
+def go_back():
+    current_path = path_entry.get()
+
+    parent_path = os.path.dirname(current_path)
+
+    if parent_path and parent_path != current_path:
+        path_entry.delete(0, tk.END)
+        path_entry.insert(0, parent_path)
+        list_files_gui()   # refresh file view
+    else:
+        write_output("Already at root directory.")
+
+top_bar = tk.Frame(file_view_frame)
+top_bar.pack(fill="x")
+
+##button to go back
+btn_back = tk.Button(file_view_frame, text="⬅ Back",command=go_back,width=10)
+btn_back.pack(side="left",  anchor="nw", padx=5, pady=5)
+
+tree = ttk.Treeview(file_view_frame)
+tree.pack(fill="both", expand=True)
 
 ##function used to show file info
 def file_info_gui():

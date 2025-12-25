@@ -17,6 +17,14 @@ root.geometry("900x600")
 folder_icon = tk.PhotoImage(file="icons/folder.png")
 file_icon   = tk.PhotoImage(file="icons/file.png")
 
+##making tree view to view the files nicely
+file_view_frame = tk.LabelFrame(root, text="File View", padx=5, pady=5)
+#file_view_frame.pack(fill="both", expand=True, padx=10, pady=5)
+file_view_frame.config(width=600, height=200)
+file_view_frame.pack_propagate(False)  ##preventing the frame from fitting the children
+file_view_frame.pack(padx=10, pady=5) 
+tree = ttk.Treeview(file_view_frame)
+tree.pack(fill="both", expand=True)
 
 #creating the path frame
 path_frame = tk.LabelFrame(root, text="Path Navigation", padx=10, pady=10)
@@ -267,14 +275,7 @@ tk.Button(proc_frame, text="CPU / Memory", width=15,command=show_usage_gui).grid
 tk.Button(proc_frame, text="App Usage Alert", width=15,command=monitor_usage_gui).grid(row=0, column=2, padx=5)
 
 
-##making tree view to view the files nicely
-file_view_frame = tk.LabelFrame(root, text="File View", padx=5, pady=5)
-#file_view_frame.pack(fill="both", expand=True, padx=10, pady=5)
-file_view_frame.config(width=600, height=200)
-file_view_frame.pack_propagate(False)  ##preventing the frame from fitting the children
-file_view_frame.pack(padx=10, pady=5) 
-tree = ttk.Treeview(file_view_frame)
-tree.pack(fill="both", expand=True)
+
 
 ##can click on files
 def on_file_select(event):

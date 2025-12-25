@@ -2,7 +2,7 @@ import os
 import time
 import stat 
 
-##function to get directory
+##function to get directory which returns the list of item containing their name, path and if its a directory
 def get_directory_items(path):
     items = []
     for name in os.listdir(path):
@@ -65,20 +65,7 @@ def create_file(path):
     except Exception as e:
         return f"Error creating file: {e}"
 
-#appending to a file
-def append_to_file(path, content):
-    try:
-        if not os.path.exists(path):
-            return "File does not exist."
-           
 
-        ##opening a file in append mode
-        with open(path, 'a') as f:
-            f.write(content + "\n")  ##appending to the file
-
-        return "Content appended Successfully!"
-    except Exception as e:
-        return f"Error appending to file:, {e}"
 
 ##reading a file
 def read_file(path):

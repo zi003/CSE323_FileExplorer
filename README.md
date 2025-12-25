@@ -34,7 +34,3 @@ This application allows users to explore directories, perform basic file operati
 
 ---
 
-## How to Run
-```bash
-pip install psutil
-python main.py

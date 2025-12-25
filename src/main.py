@@ -4,10 +4,10 @@ from process import *
 from usage_monitor import *
 
 
-
+##originally made for CLI
 def main():
     # Start in the current working directory
-
+    
     current_path = os.getcwd() 
 
     print("Welcome to OS-Insight File Explorer!")
@@ -50,12 +50,7 @@ def main():
         elif cmd[0] == "touch" and len(cmd) > 1:
             create_file(os.path.join(current_path, cmd[1]))
 
-        ##user can use 'write' to write to a file
-        elif cmd[0] == "write" and len(cmd) > 2:
-             path = os.path.join(current_path, cmd[1])
-             content = " ".join(cmd[2:])
-             append_to_file(path, content)
-
+      
         ##user can use rd to read a file
         elif cmd[0] == "rd" and len(cmd) > 1:
              read_file(os.path.join(current_path, cmd[1]))
